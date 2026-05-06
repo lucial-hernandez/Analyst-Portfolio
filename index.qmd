@@ -1,0 +1,76 @@
+---
+title: "Do Human Rights Trials Promote Democracy? Evidence from the TJET Dataset"
+format: html
+author: Lucia Hernandez
+---
+This analysis uses data from the Transitional Justice Evaluation Tools (TJET) dataset, which measures comparative data on different transitional justice mechanisms. Transitional justice refers to a range of processes implemented to address past atrocities and human rights violations committed during a period of democratic transition. These mechanisms include amnesty, lustration, criminal and civil trials, truth commissions, memorials, reparations, institutional reforms, and vetting.
+
+This analysis examines whether states that held trials for human rights violations as part of their transitional justice process are more likely to be democratic. The causal logic behind this hypothesis is that trials promote justice and accountability, establish a strong rule of law, and set a new precedent for liberal democratic values like rights, justice, and freedom. To operationalize this, two nominal variables were created: *regn*, which codes a state as a democracy (1) or autocracy (0), and *trialsn*, which codes whether at least one human rights trial was held during a transition (1) or not (0).
+
+
+```{r}
+#| echo: false
+#| message: false
+
+
+# Setup
+library(tidyverse)
+library(knitr)
+tjet <- read_csv('tjet_cy.csv')
+
+# Mutate data
+tjet <- mutate(tjet,regn = case_when(
+  reg_type_vdem=='Autocracy'~0,
+  reg_type_vdem=='Democracy'~1 ))
+
+tjet<- mutate(tjet,trialsn=case_when(
+  tran_trs_dom_dtj==0~0,
+  tran_trs_dom_dtj>=1~1))%>%
+  mutate(trialsn = as.factor(trialsn))
+
+# Bar Chart
+filter(tjet, !is.na(regn), !is.na(trialsn), 
+       region_wb != 'North America') %>%
+  ggplot(aes(x = trialsn, y = regn)) +
+  geom_bar(stat = "summary", fun = mean,
+           fill = 'darkslategray3', color = 'black') +
+  scale_x_discrete(labels = c('0' = 'no trials', '1' = 'trials')) +
+  scale_y_continuous(limits = c(0, 1),
+                     labels = scales::percent) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = 'italic', size = 10),
+        strip.text = element_text(face = "bold", size = 8),
+        strip.background = element_rect(fill = "white")) +
+  labs(x = '', y = '',
+       title = 'Human Rights Trials and Regime Type',
+       subtitle = 'Are countries that held human rights trials as a part of transitional justice more\nlikely to be democratic or autocratic?') +
+  facet_wrap(~region_wb, scales = 'free')
+
+
+```
+
+
+The bar chart above shows the proportion of democracies among states that did and did not hold trials, separated by region. North America was excluded because no states in that region have undergone transitional justice processes. The most significant patterns appear in Europe & Central Asia and Latin America & Caribbean, where 85% and 81% of trial-holding states are democracies, respectively — the two highest rates in the dataset. East Asia & Pacific and Sub-Saharan Africa show a more modest but still positive pattern, with trial-holding states reaching 52% and 43% democracy respectively, both higher than their no-trials counterparts. The Middle East & North Africa is a notable exception: only 1 country in the region held trials at all, making that comparison unreliable. South Asia similarly shows a weak pattern, with just 18% of trial-holding states coded as democracies.
+
+
+``` {r}
+#| echo: false
+
+# Table
+filter(tjet, !is.na(regn), !is.na(trialsn),
+       region_wb != 'North America',
+       trialsn == '1') %>%
+  group_by(region_wb) %>%
+  summarise(pct_democracy = mean(regn),
+            n = n()) %>%
+  mutate(pct_democracy = scales::percent(pct_democracy, accuracy = 1)) %>%
+  kable(col.names = c('Region', '% Democracy', 'N'),
+        digits = 2,
+        caption = 'Proportion of democracies among countries that held trials')
+```
+
+
+The table above summarizes these proportions alongside the sample size (N) for each region. The variation in N is worth noting — Europe & Central Asia and Latin America & Caribbean have much larger samples (102 and 156 country-years, respectively) than Middle East & North Africa (N = 1) or Sub-Saharan Africa (N = 23), which means the estimates for smaller regions should be interpreted cautiously.
+
+Taken together, the data suggest a positive association between human rights trials and democratization in most regions, though the pattern is not universal. Further statistical testing would be needed to assess whether this relationship holds after accounting for confounding factors.
