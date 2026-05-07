@@ -7,6 +7,7 @@ This project examines whether states that held trials for human rights violation
 
 ### Data
 The analysis uses the Transitional Justice Evaluation Tools (TJET) dataset, which measures comparative data on transitional justice mechanisms across countries. The replication data file is included in this repository.
+
 https://transitionaljusticedata.org/en/
 
 ### Approach
@@ -16,7 +17,8 @@ Two nominal variables operationalize the research question: whether a state is a
 This project examines whether foreign direct investment (FDI) is associated with economic growth in developing countries, exploring how the relationship varies across regions and income levels.
 
 ### Data
-The analysis uses the World Bank World Development Indicators (WDI), which provides GDP per capita growth and FDI inflow data across countries and years. 
+The analysis uses the World Bank World Development Indicators (WDI), which provides GDP per capita growth and FDI inflow data across countries and years.
+
 https://databank.worldbank.org/source/world-development-indicators
 
 
