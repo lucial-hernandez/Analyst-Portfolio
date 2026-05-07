@@ -1,5 +1,5 @@
 # Analyst-Portfolio
-Two sample projects for highlighting my skills in programming, visualization, wrangling and statistical analysis
+This repository showcases two original data analysis projects completed as part of my training in data analysis and visualization. Each project demonstrates my ability to work with real-world data using R and Quarto.
 
 ## Human Rights Trials and Democratization: A Regional Analysis
 This project examines whether states that held trials for human rights violations as part of their transitional justice process are more likely to be democratic. The causal logic behind this hypothesis is that trials promote justice and accountability, establish a strong rule of law, and set a new precedent for liberal democratic values like rights, justice, and freedom.
