@@ -1,4 +1,5 @@
 # Analyst Portfolio
+
 This repository showcases two original data analysis projects completed as part of my training in data analysis and visualization. Each project demonstrates my ability to work with real-world data using R and Quarto.
 
 ## Human Rights Trials and Democratization: A Regional Analysis
