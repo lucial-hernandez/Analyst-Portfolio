@@ -17,6 +17,7 @@ This project examines whether foreign direct investment (FDI) is associated with
 ### Data
 The analysis draws from two sources: the World Bank World Development Indicators (WDI), which provides GDP per capita growth and FDI inflow data across countries and years, and the UNCTAD World Investment Report, used to identify the developing economies that received the most FDI in 2025. The replication data file is included in this repository.
 https://databank.worldbank.org/source/world-development-indicators
+https://unctad.org/topic/investment/world-investment-report
 
 ### Approach
 The analysis explores the FDI-growth relationship across three dimensions: by World Bank region, by individual high-FDI countries, and by income classification (least developed, low income, and lower middle income). Scatter plots with linear trend lines visualize the relationship between FDI net inflows (% of GDP) and annual GDP per capita growth from 1960–2025, and a grouped bar chart compares the proportion of country-years with positive versus negative growth across high and low FDI groups.
