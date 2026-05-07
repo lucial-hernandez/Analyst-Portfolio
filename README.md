@@ -10,3 +10,12 @@ https://transitionaljusticedata.org/en/
 
 ### Approach
 Two nominal variables operationalize the research question: whether a state is a democracy or autocracy, and whether at least one human rights trial was held during a transition. The analysis visualizes the proportion of democracies among trial-holding and non-trial-holding states, broken out by World Bank region.
+
+## Does FDI Drive Growth? Evidence from the World Development Indicators
+This project examines whether foreign direct investment (FDI) is associated with economic growth in developing countries, exploring how the relationship varies across regions and income levels.
+
+### Data
+The analysis draws from two sources: the World Bank World Development Indicators (WDI), which provides GDP per capita growth and FDI inflow data across countries and years, and the UNCTAD World Investment Report, used to identify the developing economies that received the most FDI in 2025. The replication data file is included in this repository.
+
+### Approach
+The analysis explores the FDI-growth relationship across three dimensions: by World Bank region, by individual high-FDI countries, and by income classification (least developed, low income, and lower middle income). Scatter plots with linear trend lines visualize the relationship between FDI net inflows (% of GDP) and annual GDP per capita growth from 1960–2025, and a grouped bar chart compares the proportion of country-years with positive versus negative growth across high and low FDI groups.
