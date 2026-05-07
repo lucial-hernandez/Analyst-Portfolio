@@ -1,0 +1,58 @@
+---
+title: "Exemplary Code Chunk: Web Scraping U.S. Senate Data"
+format: html
+author: Lucia Hernandez
+---
+This chunk scrapes the C-SPAN congressional directory to build a clean dataset of all current U.S. Senators. Using the rvest package, it pulls structured HTML elements from the page  (senator names, party affiliation, state, and profile URLs) and assembles them into a tidy tibble. The scraper targets specific CSS selectors (div.text, a.name h3, span.organization) to extract only the relevant fields from a complex webpage.
+
+Once the raw data is collected, the chunk uses stringr to parse the partyandstate field into two separate variables: party, extracted as a single letter (D, R, or I), and state, extracted as a two-letter code following a dash using a regex lookbehind ((?<=-)[A-Z]{2}). The intermediate partyandstate column is then dropped, the columns are reordered for readability with relocate(), and the final dataset is saved as a CSV. The result is a clean, analysis-ready table of senators built entirely from a live webpage.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(rvest)
+
+```
+
+```{r}
+cspan <- read_html("https://www.c-span.org/congress/members/?chamber=senate&all")
+
+sens <- cspan %>%
+  html_elements("div.text")
+
+name <- sens %>%
+  html_element("a.name h3")%>%
+  html_text2()
+
+partyandstate <- sens %>%
+  html_element("span.organization")%>%
+  html_text2()
+
+prof.url <- sens %>%
+  html_element("a")%>%
+  html_attr("href")
+
+
+sens.data <- 
+  tibble(
+    name = sens %>%
+      html_element("a.name h3")%>%
+      html_text2(),
+    partyandstate = sens %>%
+      html_element("span.organization")%>%
+      html_text2(),
+    url = sens %>%
+      html_element("a")%>%
+      html_attr("href"))%>%
+  mutate(
+    party = str_extract(partyandstate, "D|R|I"),
+    state = str_extract(partyandstate, "(?<=-)[A-Z]{2}"))%>%
+  relocate(url, .after = state)
+
+sens.data$partyandstate <- NULL
+
+write_csv(sens.data, "Senator Data.csv")
+
+```
+*Full dataset available as Senator_Data.csv in this repository.*
+
