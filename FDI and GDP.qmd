@@ -1,0 +1,164 @@
+---
+title: "Does FDI Drive Growth?"
+subtitle: "Evidence from the World Development Indicators"
+author: "Lucia Hernandez"
+format:
+  beamer: 
+    theme: Szeged
+    colortheme: seahorse
+knitr: 
+  opts_chunk:
+    echo: false
+    comment: NA
+    message: FALSE
+    warning: FALSE 
+
+---
+# Analysis
+```{r}
+library(tidyverse)
+library(knitr)
+df0 <- read_csv('WDICSV.csv')
+
+df <- df0 %>%
+  pivot_longer(
+    cols = 5:70,
+    names_to = 'year',
+    values_to = 'score'
+  ) %>%
+  filter(`Indicator Code` == 'BX.KLT.DINV.WD.GD.ZS' |
+          `Indicator Code` == 'NY.GDP.PCAP.KD.ZG')%>%
+  pivot_wider(
+    values_from = 'score',
+    names_from = `Indicator Code`
+  )%>%
+  rename(
+    fdi = 'BX.KLT.DINV.WD.GD.ZS',
+    gdp = 'NY.GDP.PCAP.KD.ZG'
+  )%>%
+  mutate( year = as.integer(year))%>%
+  group_by(`Country Name`, `Country Code`, year) %>%
+  summarize(
+    fdi = first(na.omit(fdi)),
+    gdp = first(na.omit(gdp)),
+    .groups = 'drop'
+  )
+
+```
+
+##
+```{r}
+ 
+filter(df, 
+  `Country Name` == 'East Asia & Pacific (excluding high income)'| 
+  `Country Name` == 'Sub-Saharan Africa (excluding high income)'|
+  `Country Name` == 'Latin America & Caribbean (excluding high income)' | 
+  `Country Name` == 'Middle East, North Africa, Afghanistan & Pakistan (excluding high income)') %>%
+    ggplot(aes(fdi,gdp))+
+    geom_point(color = 'darkorchid4')+
+    geom_smooth(method=lm, color = 'darkorchid4')+
+    theme_minimal()+
+    theme(plot.title = element_text(size = 12, face = 'bold'),
+    strip.text = element_text(size = 12, face = "bold"))+
+    facet_wrap(~`Country Name`, scales = 'free')+
+    labs(
+    title = 'Figure 1: FDI and GDP per capita in each region',
+    subtitle = "FDI is positively associated with GDP growth in most regions, but the relationship is weakest in Latin America",
+      x = "	
+Foreign direct investment, net inflows (% of GDP)",
+      y = 'GDP per capita (annual % growth)',
+      caption = "Source: World Bank World Development Indicators (WDI)"
+)
+
+ 
+```
+
+## 
+```{r}
+filter(df, 
+  `Country Name` == 'Least developed countries: UN classification' | 
+  `Country Name` == 'Low income' |
+  `Country Name` == 'Lower middle income') %>%
+  mutate(`Country Name` = recode(`Country Name`,
+    'Least developed countries: UN classification' = 'Least developed')) %>%
+  ggplot(aes(fdi, gdp)) +
+  geom_point(color = 'cornflowerblue') +
+  geom_smooth(method = lm, color = 'cornflowerblue') +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 12, face = 'bold'),
+        strip.text = element_text(size = 12, face = "bold")) +
+  facet_wrap(~`Country Name`, scales = 'free') +
+  labs(
+    title = 'Figure 2: FDI and GDP per capita least developed, low income, and middle income countries',
+    subtitle = "Least developed countries show the clearest positive relationship between FDI and growth.",
+    x = "Foreign direct investment, net inflows (% of GDP)",
+    y = 'GDP per capita (annual % growth)',
+    caption = "Source: World Bank World Development Indicators (WDI)"
+  )
+```
+##
+
+```{r}
+df2 <- df %>%
+  mutate(
+    gdp_growth = if_else(gdp>0, "positive","negative"),
+    fdi_gr = if_else(fdi > median(fdi, na.rm = T), "High FDI", "Low FDI"),
+    fdi_group = fct_relevel(fdi_gr, "Low FDI", "High FDI"))
+
+  
+
+df2 %>%
+  filter(!is.na(fdi), !is.na(gdp_growth))%>%
+  group_by(gdp_growth)%>%
+  summarize(
+    n = n(),
+    mean_fdi = mean(fdi, na.rm =T),
+    median_fdi = median(fdi, na.rm =T)
+  )%>%
+  kable(digits = 2,
+        caption = 'Table 1: Average FDI by GDP Growth Direction',
+        col.names = c('Growth Direction', "N", "Mean FDI", "Median FDI"))
+```  
+
+ 
+## 
+```{r}
+
+df2 %>%
+  filter(!is.na(fdi_group), !is.na(gdp_growth)) %>%
+    group_by(fdi_group, gdp_growth) %>%
+    summarize(n = n()) %>%
+    ungroup()%>%
+    group_by(fdi_group) %>%
+    mutate(prop = n / sum(n)) %>%
+    ggplot(aes(x = fdi_group, y = prop, fill = gdp_growth)) +
+    geom_col() +
+    scale_fill_manual(values = c("negative" = "azure2", 
+                                 "positive" = "darkslategray3")) +
+    scale_y_continuous(labels = scales::percent) +
+    theme_minimal() +
+    theme(plot.title = element_text(size = 12, face = 'bold'))+
+    labs(
+      title = "Figure 3: Proportion of Country-Years with Positive vs. Negative GDP Growth",
+      subtitle = "High-FDI country-years are more likely to have positive GDP growth than low-FDI country-years",
+      x = "FDI Group",
+      y = "Proportion of Country-Years",
+      fill = "GDP Growth",
+      caption = 'FDI Group calculated as being above of below the median'
+    )
+
+
+
+```
+# Conclusion
+
+## Conclusion
+- Higher FDI is associated with higher GDP per capita across most regions, but the relationship is not uniform.
+- East Asia and Sub-Saharan Africa show the clearest positive slopes, while Latin America shows little to no relationship. 
+- Countries that receive high levels of FDI appear to have a negative slope, which could suggest diminishing returns at high inflow levels
+- Least developed and lower-midle income countries show stronger positive associations than low-income countries
+- Country-years with positive GDP growth had higher median FDI (1.84%) than country-yeas with negative GDP growth (0.9%). 
+ 
+
+
+
